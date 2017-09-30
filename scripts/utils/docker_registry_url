@@ -1,0 +1,30 @@
+#!/bin/bash
+## template
+CURR_DIR=$(dirname $0);
+PROJ_DIR=${CURR_DIR}/../..;
+SETUP_DIR=${PROJ_DIR}/.setup;
+CONF_DIR=${PROJ_DIR}/conf.d;
+
+## arguments
+DOCKER_API_VERSION=$1;
+if [[ ${DOCKER_API_VERSION} = "" ]]; then
+  DOCKER_API_VERSION="$(${CURR_DIR}/docker_api_version)";
+fi;
+
+## constants
+CONF_FILE_PATH="${CONF_DIR}/DOCKER_REGISTRY_URL";
+OUTPUT_FILE="${SETUP_DIR}/docker_registry.Url";
+
+## processing
+__exists=$(stat ${CONF_FILE_PATH} &>/dev/null);
+if [[ $? = "0" ]]; then
+  DOCKER_REGISTRY_URL=$(cat ${CONF_FILE_PATH});
+elif [[ ${DOCKER_API_VERSION} = 'v1' ]]; then
+  DOCKER_REGISTRY_URL='https://index.docker.io';
+else
+  DOCKER_REGISTRY_URL='https://registry.hub.docker.com';
+fi;
+
+## output
+printf "$DOCKER_REGISTRY_URL" > "${OUTPUT_FILE}";
+printf "$DOCKER_REGISTRY_URL";

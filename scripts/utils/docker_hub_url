@@ -1,0 +1,19 @@
+#!/bin/bash
+## template
+CURR_DIR=$(dirname $0);
+PROJ_DIR=${CURR_DIR}/../..;
+SETUP_DIR=${PROJ_DIR}/.setup;
+CONF_DIR=${PROJ_DIR}/conf.d;
+
+## constants
+CONF_FILE_PATH="${CONF_DIR}/DOCKER_HUB_URL";
+OUTPUT_FILE="${SETUP_DIR}/docker_hub.Url";
+
+## processing
+DOCKER_HUB_URL='https://hub.docker.com';
+__exists=$(stat ${CONF_FILE_PATH} &>/dev/null);
+if [[ $? = "0" ]]; then DOCKER_HUB_URL=$(cat ${CONF_FILE_PATH}); fi;
+
+## output
+printf "$DOCKER_HUB_URL" > "${OUTPUT_FILE}";
+printf "$DOCKER_HUB_URL";

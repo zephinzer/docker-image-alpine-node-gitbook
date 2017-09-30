@@ -1,0 +1,4 @@
+#!/bin/sh
+printf "GITBOOK    : v$(gitbook --version | grep 'GitBook version' | cut -f 3 -d ' ')\n";
+printf "NODE       : $(node --version)\n";
+printf "YARN       : v$(yarn --version)\n";

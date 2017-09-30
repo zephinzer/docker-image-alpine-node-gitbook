@@ -1,0 +1,41 @@
+#!/bin/bash
+## template
+CURR_DIR=$(dirname $0);
+PROJ_DIR=${CURR_DIR}/../..;
+SETUP_DIR=${PROJ_DIR}/.setup;
+CONF_DIR=${PROJ_DIR}/conf.d;
+
+## arguments
+BASE_IMAGE_SOURCE=$1;
+if [[ ${BASE_IMAGE_SOURCE} = "" ]]; then
+  BASE_IMAGE_SOURCE="$(${CURR_DIR}/base_image_source)";
+  if [[ ${BASE_IMAGE_SOURCE} = "" ]]; then
+    printf "[ERROR] A base image name couldn't be found. Specify it as the first argument to this script or run ${CURR_DIR}/base_image_source to check the output. Aborting...\n";
+    exit 1;
+  fi;
+fi;
+
+DOCKER_API_VERSION=$2;
+if [[ ${DOCKER_API_VERSION} = "" ]]; then
+  DOCKER_API_VERSION="$(${CURR_DIR}/docker_api_version)";
+  if [[ ${DOCKER_API_VERSION} = "" ]]; then
+    printf "[ERROR] A version to use for the Docker Hub/Registry API couldn't be found. Specify it as the second argument to this script or run ${CURR_DIR}/docker_api_version to check the output. Aborting...\n";
+    exit 1;
+  fi;
+fi;
+
+## constants
+DOCKER_REGISTRY_URL="$(${CURR_DIR}/docker_registry_url ${DOCKER_API_VERSION})";
+OUTPUT_FILE="${SETUP_DIR}/docker_hub_repo_tags";
+
+## processing
+if [[ ${DOCKER_API_VERSION} = 'v1' ]]; then
+  DOCKER_HUB_REPO_TAGS=$(curl -sSlfa -X GET "${DOCKER_REGISTRY_URL}/v1/repositories/${BASE_IMAGE_SOURCE}/tags");
+elif [[ ${DOCKER_API_VERSION} = 'v2' ]]; then
+  TOKEN=$(${CURR_DIR}/docker_hub_token);
+  DOCKER_HUB_REPO_TAGS=$(curl -sSlfa -X GET "${DOCKER_REGISTRY_URL}/v2/repositories/${BASE_IMAGE_SOURCE}/tags/");
+fi;
+
+## output
+printf "$DOCKER_HUB_REPO_TAGS" > "${OUTPUT_FILE}";
+printf "$DOCKER_HUB_REPO_TAGS";

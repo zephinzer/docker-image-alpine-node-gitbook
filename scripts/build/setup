@@ -1,0 +1,48 @@
+#!/bin/bash
+CURR_DIR=$(dirname $0);
+PROJ_DIR=${CURR_DIR}/../..;
+CONF_DIR=${PROJ_DIR}/conf.d;
+SETUP_DIR=${PROJ_DIR}/.setup;
+mkdir -p ${SETUP_DIR};
+
+IMAGE_NAME='zephinzer/alpine-node';
+IMAGE_NAME_KEY='__IMAGE_NAME__';
+_=$(stat ${CONF_DIR}/IMAGE_NAME &>/dev/null);
+if [[ $? = "0" ]]; then
+  IMAGE_NAME=$(cat ${CONF_DIR}/IMAGE_NAME);
+fi;
+IMAGE_NAME_SED="s|${IMAGE_NAME_KEY}|${IMAGE_NAME}|g";
+printf "IMAGE_NAME:             ${IMAGE_NAME}\n";
+printf "${IMAGE_NAME}" > "${SETUP_DIR}/image.Name";
+
+IMAGE_TAG='latest-argon';
+IMAGE_TAG_KEY='__IMAGE_TAG__';
+_=$(stat ${CONF_DIR}/IMAGE_TAG &>/dev/null);
+if [[ $? = "0" ]]; then
+  IMAGE_TAG=$(cat ${CONF_DIR}/IMAGE_TAG);
+fi;
+IMAGE_TAG_SED="s|${IMAGE_TAG_KEY}|${IMAGE_TAG}|g";
+printf "IMAGE_TAG:              ${IMAGE_TAG}\n";
+printf "${IMAGE_TAG}" > "${SETUP_DIR}/image.Tag";
+
+GITBOOK_VERSION='3.2.3';
+GITBOOK_VERSION_KEY='__GITBOOK_VERSION__';
+_=$(stat ${CONF_DIR}/GITBOOK_VERSION &>/dev/null);
+if [[ $? != "0" ]]; then
+  npm install -g gitbook;
+  GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
+  if [[ $? = "0" ]]; then
+    GITBOOK_VERSION=$(printf "${GITBOOK_VERSIONS}" | tail -n 1);
+  fi;
+else
+  GITBOOK_VERSION=$(cat ${CONF_DIR}/GITBOOK_VERSION);
+fi;
+GITBOOK_VERSION_SED="s|${GITBOOK_VERSION_KEY}|${GITBOOK_VERSION}|g";
+printf "GITBOOK_VERSION:        ${GITBOOK_VERSION}\n";
+printf "${GITBOOK_VERSION}" > "${SETUP_DIR}/gitbook.Version";
+
+sed \
+  -e "${IMAGE_NAME_SED}" \
+  -e "${IMAGE_TAG_SED}" \
+  -e "${GITBOOK_VERSION_SED}" \
+  ${PROJ_DIR}/.Dockerfile > ${PROJ_DIR}/Dockerfile;

@@ -1,0 +1,19 @@
+#!/bin/bash
+## template
+CURR_DIR=$(dirname $0);
+PROJ_DIR=${CURR_DIR}/../..;
+SETUP_DIR=${PROJ_DIR}/.setup;
+CONF_DIR=${PROJ_DIR}/conf.d;
+
+## constants
+CONF_FILE_PATH="${CONF_DIR}/DOCKER_API_VERSION";
+OUTPUT_FILE="${SETUP_DIR}/docker_api.Version";
+
+## processing
+DOCKER_API_VERSION='v1';
+__exists=$(stat ${CONF_FILE_PATH} &>/dev/null);
+if [[ $? = "0" ]]; then DOCKER_API_VERSION=$(cat ${CONF_FILE_PATH}); fi;
+
+## output
+printf "$DOCKER_API_VERSION" > "${OUTPUT_FILE}";
+printf "$DOCKER_API_VERSION";
