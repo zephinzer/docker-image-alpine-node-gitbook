@@ -16,7 +16,7 @@ docker tag next_alpine_node_gitbook   ${DOCKER_REPO}:${GITBOOK_VERSION};
 docker push                           ${DOCKER_REPO}:${GITBOOK_VERSION};
 docker tag next_alpine_node_gitbook   ${DOCKER_REPO}:${EXISTENCE_TAG};
 docker push                           ${DOCKER_REPO}:${EXISTENCE_TAG};
-docker tag next_alpine_node_gitbook   latest;
-docker push                           latest;
+docker tag next_alpine_node_gitbook   ${DOCKER_REPO}:latest;
+docker push                           ${DOCKER_REPO}:latest;
 docker logout
 ${CURR_DIR}/../build/teardown;
