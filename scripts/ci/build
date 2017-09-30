@@ -11,7 +11,7 @@ NODE_VERSION="$(echo "${CONTAINER_INFO}" | grep 'NODE' | cut -f 2 -d ':')";
 YARN_VERSION="$(echo "${CONTAINER_INFO}" | grep 'YARN' | cut -f 2 -d ':')";
 GITBOOK_VERSION="$(echo "${CONTAINER_INFO}" | grep 'GITBOOK' | cut -f 2 -d ':')";
 EXISTENCE_TAG="node-${NODE_VERSION}_yarn-${YARN_VERSION}_gitbook-${GITBOOK_VERSION}";
-docker login -u  $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD;
+docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD;
 docker tag next_alpine_node_gitbook   ${DOCKER_REPO}:${GITBOOK_VERSION};
 docker push                           ${DOCKER_REPO}:${GITBOOK_VERSION};
 docker tag next_alpine_node_gitbook   ${DOCKER_REPO}:${EXISTENCE_TAG};
