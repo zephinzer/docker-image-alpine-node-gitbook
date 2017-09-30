@@ -29,10 +29,14 @@ GITBOOK_VERSION='3.2.3';
 GITBOOK_VERSION_KEY='__GITBOOK_VERSION__';
 _=$(stat ${CONF_DIR}/GITBOOK_VERSION &>/dev/null);
 if [[ $? != "0" ]]; then
-  npm install -g gitbook;
-  GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
+  _=$(stat ${SETUP_DIR}/gitbook.Versions &>/dev/null);
+  if [[ $? != "0" ]]; then
+    npm install -g gitbook-cli &>/dev/null;
+    GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
+    printf "${GITBOOK_VERSIONS}" > "${SETUP_DIR}/gitbook.Versions";
+  fi;
   if [[ $? = "0" ]]; then
-    GITBOOK_VERSION=$(printf "${GITBOOK_VERSIONS}" | tail -n 1);
+    GITBOOK_VERSION=$(cat "${SETUP_DIR}/gitbook.Versions" | tail -n 1);
   fi;
 else
   GITBOOK_VERSION=$(cat ${CONF_DIR}/GITBOOK_VERSION);
@@ -40,6 +44,18 @@ fi;
 GITBOOK_VERSION_SED="s|${GITBOOK_VERSION_KEY}|${GITBOOK_VERSION}|g";
 printf "GITBOOK_VERSION:        ${GITBOOK_VERSION}\n";
 printf "${GITBOOK_VERSION}" > "${SETUP_DIR}/gitbook.Version";
+
+if [[ ${DOCKER_TEMP_TAGS} = "" ]]; then
+  DOCKER_TEMP_TAGS='next_alpine_node_gitbook';
+fi;
+printf "DOCKER_TEMP_TAGS:       ${DOCKER_TEMP_TAGS}\n";
+printf "${DOCKER_TEMP_TAGS}" > "${SETUP_DIR}/docker_temp.Tag";
+
+if [[ ${DOCKER_REPO} = "" ]]; then
+  DOCKER_REPO='zephinzer/alpine-node-gitbook';
+fi;
+printf "DOCKER_REPO:            ${DOCKER_REPO}\n";
+printf "${DOCKER_REPO}" > "${SETUP_DIR}/repo.Name";
 
 sed \
   -e "${IMAGE_NAME_SED}" \

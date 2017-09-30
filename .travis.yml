@@ -3,4 +3,3 @@ services:
   - docker
 script:
   - ./scripts/ci/build
-  - ./scripts/ci/publish
