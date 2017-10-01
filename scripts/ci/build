@@ -7,6 +7,10 @@ SETUP_DIR=${PROJ_DIR}/.setup;
 NEXT_TAG='next_alpine_node_gitbook';
 
 ${CURR_DIR}/../build/setup;
+if [[ $? != "0" ]]; then
+  printf "\n\033[31m[ERR] ${CURR_DIR}/../build/setup exited with errors.\033[0m\n";
+  exit 1;
+fi;
 
 docker build -f ${PROJ_DIR}/Dockerfile "${PROJ_DIR}" -t ${NEXT_TAG};
 CONTAINER_INFO="$(docker run ${NEXT_TAG})";
@@ -32,3 +36,7 @@ docker push              ${REPOSITORY_NAME}:latest;
 printf "DONE                    : $(date +'%Y-%m-%d %H:%M:%S')\n";
 
 ${CURR_DIR}/../build/teardown;
+if [[ $? != "0" ]]; then
+  printf "\n\033[31m[ERR] ${CURR_DIR}/../build/teardown exited with errors.\033[0m\n";
+  exit 1;
+fi;
