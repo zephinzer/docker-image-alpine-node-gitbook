@@ -1,4 +1,4 @@
-language: bash
+language: node
 services:
   - docker
 before_script:
