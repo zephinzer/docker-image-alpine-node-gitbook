@@ -13,14 +13,11 @@ OUTPUT_FILE="${SETUP_DIR}/gitbook.Version";
 _=$(stat ${CONF_DIR}/GITBOOK_VERSION &>/dev/null);
 if [[ $? != "0" ]]; then
   _=$(stat ${SETUP_DIR}/gitbook.Versions &>/dev/null);
-  if [[ $? != "0" ]]; then
-    npm install -g gitbook-cli;
-    if [[ $? != "0" ]]; then exit 1; fi;
-    GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
-    printf "${GITBOOK_VERSIONS}" > "${SETUP_DIR}/gitbook.Versions";
-  fi;
+  npm install -g gitbook-cli &>/dev/null;
+  if [[ $? != "0" ]]; then exit 1; fi;
+  GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
   if [[ $? = "0" ]]; then
-    GITBOOK_VERSION=$(cat "${SETUP_DIR}/gitbook.Versions" | tail -n 1);
+    GITBOOK_VERSION=$(printf "${GITBOOK_VERSIONS}" | tail -n 1);
   fi;
 else
   GITBOOK_VERSION=$(cat ${CONF_DIR}/GITBOOK_VERSION);
