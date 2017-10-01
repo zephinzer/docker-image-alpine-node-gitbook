@@ -1,64 +1,39 @@
 #!/bin/bash
 CURR_DIR=$(dirname $0);
+UTILS_DIR=${CURR_DIR}/../utils;
 PROJ_DIR=${CURR_DIR}/../..;
 CONF_DIR=${PROJ_DIR}/conf.d;
 SETUP_DIR=${PROJ_DIR}/.setup;
 mkdir -p ${SETUP_DIR};
 
-IMAGE_NAME='zephinzer/alpine-node';
-IMAGE_NAME_KEY='__IMAGE_NAME__';
-_=$(stat ${CONF_DIR}/IMAGE_NAME &>/dev/null);
-if [[ $? = "0" ]]; then
-  IMAGE_NAME=$(cat ${CONF_DIR}/IMAGE_NAME);
-fi;
-IMAGE_NAME_SED="s|${IMAGE_NAME_KEY}|${IMAGE_NAME}|g";
-printf "IMAGE_NAME:             ${IMAGE_NAME}\n";
-printf "${IMAGE_NAME}" > "${SETUP_DIR}/image.Name";
+# output build versions
+BUILD_VERSION=$(${UTILS_DIR}/build_version);
+printf "BUILD_VERSION:          $BUILD_VERSION\n";
 
-IMAGE_TAG='latest-argon';
-IMAGE_TAG_KEY='__IMAGE_TAG__';
-_=$(stat ${CONF_DIR}/IMAGE_TAG &>/dev/null);
-if [[ $? = "0" ]]; then
-  IMAGE_TAG=$(cat ${CONF_DIR}/IMAGE_TAG);
-fi;
-IMAGE_TAG_SED="s|${IMAGE_TAG_KEY}|${IMAGE_TAG}|g";
-printf "IMAGE_TAG:              ${IMAGE_TAG}\n";
-printf "${IMAGE_TAG}" > "${SETUP_DIR}/image.Tag";
+# output docker registry url
+DOCKER_REGISTRY_URL=$(${UTILS_DIR}/docker_registry_url);
+printf "DOCKER_REGISTRY_URL:    $DOCKER_REGISTRY_URL\n";
 
-GITBOOK_VERSION='3.2.3';
+## BASE_IMAGE_NAME
+BASE_IMAGE_NAME=$(${UTILS_DIR}/base_image_name);
+BASE_IMAGE_NAME_KEY='__BASE_IMAGE_NAME__';
+BASE_IMAGE_NAME_SED="s|${BASE_IMAGE_NAME_KEY}|${BASE_IMAGE_NAME}|g";
+printf "BASE_IMAGE_NAME:             ${BASE_IMAGE_NAME}\n";
+
+## BASE_IMAGE_TAG
+BASE_IMAGE_TAG=$(${UTILS_DIR}/base_image_tag);
+BASE_IMAGE_TAG_KEY='__BASE_IMAGE_TAG__';
+BASE_IMAGE_TAG_SED="s|${BASE_IMAGE_TAG_KEY}|${BASE_IMAGE_TAG}|g";
+printf "BASE_IMAGE_TAG:              ${BASE_IMAGE_TAG}\n";
+
+## GITBOOK_VERSION
+GITBOOK_VERSION=$(${UTILS_DIR}/gitbook_version);
 GITBOOK_VERSION_KEY='__GITBOOK_VERSION__';
-_=$(stat ${CONF_DIR}/GITBOOK_VERSION &>/dev/null);
-if [[ $? != "0" ]]; then
-  _=$(stat ${SETUP_DIR}/gitbook.Versions &>/dev/null);
-  if [[ $? != "0" ]]; then
-    npm install -g gitbook-cli &>/dev/null;
-    GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
-    printf "${GITBOOK_VERSIONS}" > "${SETUP_DIR}/gitbook.Versions";
-  fi;
-  if [[ $? = "0" ]]; then
-    GITBOOK_VERSION=$(cat "${SETUP_DIR}/gitbook.Versions" | tail -n 1);
-  fi;
-else
-  GITBOOK_VERSION=$(cat ${CONF_DIR}/GITBOOK_VERSION);
-fi;
 GITBOOK_VERSION_SED="s|${GITBOOK_VERSION_KEY}|${GITBOOK_VERSION}|g";
 printf "GITBOOK_VERSION:        ${GITBOOK_VERSION}\n";
-printf "${GITBOOK_VERSION}" > "${SETUP_DIR}/gitbook.Version";
-
-if [[ ${DOCKER_TEMP_TAGS} = "" ]]; then
-  DOCKER_TEMP_TAGS='next_alpine_node_gitbook';
-fi;
-printf "DOCKER_TEMP_TAGS:       ${DOCKER_TEMP_TAGS}\n";
-printf "${DOCKER_TEMP_TAGS}" > "${SETUP_DIR}/docker_temp.Tag";
-
-if [[ ${DOCKER_REPO} = "" ]]; then
-  DOCKER_REPO='zephinzer/alpine-node-gitbook';
-fi;
-printf "DOCKER_REPO:            ${DOCKER_REPO}\n";
-printf "${DOCKER_REPO}" > "${SETUP_DIR}/repo.Name";
 
 sed \
-  -e "${IMAGE_NAME_SED}" \
-  -e "${IMAGE_TAG_SED}" \
+  -e "${BASE_IMAGE_NAME_SED}" \
+  -e "${BASE_IMAGE_TAG_SED}" \
   -e "${GITBOOK_VERSION_SED}" \
   ${PROJ_DIR}/.Dockerfile > ${PROJ_DIR}/Dockerfile;

@@ -1,5 +1,9 @@
 language: bash
 services:
   - docker
+before_script:
+  - docker login -u "${DOCKER_HUB_USERNAME}" -p "${DOCKER_HUB_PASSWORD}";
+after_script:
+  - docker logout
 script:
   - ./scripts/ci/build

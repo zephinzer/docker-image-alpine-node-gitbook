@@ -1,0 +1,8 @@
+#!/bin/sh
+IMAGE_NAME=alpine-node-gitbook-app
+CONTAIENR_NAME=alpine-node-gitbook-with-dockerfile
+CONTAINER_PORT=4000
+HOST_PORT=80
+
+docker build . -t ${IMAGE_NAME}
+docker run -t -i -p ${HOST_PORT}:${CONTAINER_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}

@@ -1,0 +1,12 @@
+#!/bin/bash
+CURR_DIR=$(dirname $0);
+if [[ $TRAVIS_PULL_REQUEST = "false" ]]; then
+  git checkout ${TRAVIS_BRANCH};
+  COMMIT_MESSAGE=$(git log -n 1 --pretty=format:"%B");
+  if [[ $COMMIT_MESSAGE == *"[force build]"* ]]; then
+    ${CURR_DIR}/../versioning/iterate minor -i -q;
+  else
+    ${CURR_DIR}/../versioning/iterate -i -q;
+  fi;
+  git push -q https://zephinzer:${GITHUB_TOKEN}@github.com/zephinzer/docker-image-alpine-node-gitbook.git --tags;
+fi;

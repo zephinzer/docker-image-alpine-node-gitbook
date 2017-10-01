@@ -1,0 +1,11 @@
+version: "3"
+services:
+  gitbook:
+    build: .
+    container_name: alpine-node-gitbook-with-docker-compose-and-build
+    working_dir: /app
+    entrypoint: "gitbook serve"
+    expose:
+      - "4000/tcp"
+    ports:
+      - "80:4000"

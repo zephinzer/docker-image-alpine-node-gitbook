@@ -1,0 +1,20 @@
+#!/bin/bash
+## template
+CURR_DIR=$(dirname $0);
+PROJ_DIR=${CURR_DIR}/../..;
+CONF_DIR=${PROJ_DIR}/conf.d;
+SETUP_DIR=${PROJ_DIR}/.setup;
+
+## constants
+BASE_IMAGE_NAME='zephinzer/alpine-node';
+OUTPUT_FILE="${SETUP_DIR}/image.Name";
+
+## processing
+_=$(stat ${CONF_DIR}/BASE_IMAGE_NAME &>/dev/null);
+if [[ $? = "0" ]]; then
+  BASE_IMAGE_NAME=$(cat ${CONF_DIR}/BASE_IMAGE_NAME);
+fi;
+
+## output
+printf "${BASE_IMAGE_TAG}" > "${OUTPUT_FILE}";
+printf "${BASE_IMAGE_NAME}";
