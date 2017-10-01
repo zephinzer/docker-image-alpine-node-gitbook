@@ -14,7 +14,7 @@ _=$(stat ${CONF_DIR}/GITBOOK_VERSION &>/dev/null);
 if [[ $? != "0" ]]; then
   _=$(stat ${SETUP_DIR}/gitbook.Versions &>/dev/null);
   if [[ $? != "0" ]]; then
-    npm install -g gitbook-cli &>/dev/null;
+    npm install -g gitbook-cli;
     GITBOOK_VERSIONS=$(gitbook ls-remote | sed -e "s|, |  |g" | xargs -n1 echo | sort | egrep "^[0-9]\.[0-9]\.[0-9]$");
     printf "${GITBOOK_VERSIONS}" > "${SETUP_DIR}/gitbook.Versions";
   fi;
