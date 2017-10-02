@@ -5,13 +5,13 @@ PROJ_DIR=${CURR_DIR}/../..;
 SETUP_DIR=${PROJ_DIR}/.setup;
 
 NEXT_TAG='next_alpine_node_gitbook';
-
 ${CURR_DIR}/../build/setup;
 if [[ $? != "0" ]]; then
   printf "\n\033[31m[ERR] ${CURR_DIR}/../build/setup exited with errors.\033[0m\n";
   exit 1;
 fi;
 
+REPOSITORY_NAME=$(${UTILS_DIR}/repository_name 'zephinzer/alpine-node-gitbook');
 docker build -f ${PROJ_DIR}/Dockerfile "${PROJ_DIR}" -t ${NEXT_TAG};
 CONTAINER_INFO="$(docker run ${NEXT_TAG})";
 NODE_VERSION="$(printf "${CONTAINER_INFO}" | grep 'NODE' | cut -f 2 -d ':')";
@@ -21,19 +21,20 @@ printf "CURRENT YARN            : ${YARN_VERSION}\n";
 GITBOOK_VERSION="$(printf "${CONTAINER_INFO}" | grep 'GITBOOK' | cut -f 2 -d ':')";
 printf "CURRENT GITBOOK         : ${GITBOOK_VERSION}\n";
 EXISTENCE_TAG="node-${NODE_VERSION}_yarn-${YARN_VERSION}_gitbook-${GITBOOK_VERSION}";
-
-if [[ $REPOSITORY_NAME = "" ]]; then REPOSITORY_NAME=$(${UTILS_DIR}/repository_name); fi;
-
-printf "PUSHING                 : ${REPOSITORY_NAME}:${GITBOOK_VERSION}...\n";
-docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:${GITBOOK_VERSION};
-docker push              ${REPOSITORY_NAME}:${GITBOOK_VERSION};
-printf "PUSHING                 : ${REPOSITORY_NAME}:${EXISTENCE_TAG}...\n";
-docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:${EXISTENCE_TAG};
-docker push              ${REPOSITORY_NAME}:${EXISTENCE_TAG};
-printf "PUSHING                 : ${REPOSITORY_NAME}:latest...\n";
-docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:latest;
-docker push              ${REPOSITORY_NAME}:latest;
-printf "DONE                    : $(date +'%Y-%m-%d %H:%M:%S')\n";
+EXISTS=$(${UTILS_DIR}/docker_registry_repo_tags "${REPOSITORY_NAME}");
+printf "$EXISTS" | jq -r '.[]|.name' | grep "${EXISTENCE_TAG}";
+if [[ $? != "0" ]]; then
+  printf "PUSHING                 : ${REPOSITORY_NAME}:${GITBOOK_VERSION}...\n";
+  docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:${GITBOOK_VERSION};
+  docker push              ${REPOSITORY_NAME}:${GITBOOK_VERSION};
+  printf "PUSHING                 : ${REPOSITORY_NAME}:${EXISTENCE_TAG}...\n";
+  docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:${EXISTENCE_TAG};
+  docker push              ${REPOSITORY_NAME}:${EXISTENCE_TAG};
+  printf "PUSHING                 : ${REPOSITORY_NAME}:latest...\n";
+  docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:latest;
+  docker push              ${REPOSITORY_NAME}:latest;
+  printf "DONE                    : $(date +'%Y-%m-%d %H:%M:%S')\n";
+fi;
 
 ${CURR_DIR}/../build/teardown;
 if [[ $? != "0" ]]; then

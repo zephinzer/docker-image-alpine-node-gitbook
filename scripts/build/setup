@@ -15,13 +15,13 @@ DOCKER_REGISTRY_URL=$(${UTILS_DIR}/docker_registry_url);
 printf "DOCKER_REGISTRY_URL:    $DOCKER_REGISTRY_URL\n";
 
 ## BASE_IMAGE_NAME
-BASE_IMAGE_NAME=$(${UTILS_DIR}/base_image_name);
+BASE_IMAGE_NAME=$(${UTILS_DIR}/base_image_name 'zephinzer/alpine-node');
 BASE_IMAGE_NAME_KEY='__BASE_IMAGE_NAME__';
 BASE_IMAGE_NAME_SED="s|${BASE_IMAGE_NAME_KEY}|${BASE_IMAGE_NAME}|g";
 printf "BASE_IMAGE_NAME:        ${BASE_IMAGE_NAME}\n";
 
 ## BASE_IMAGE_TAG
-BASE_IMAGE_TAG=$(${UTILS_DIR}/base_image_tag);
+BASE_IMAGE_TAG=$(${UTILS_DIR}/base_image_tag 'latest-argon');
 BASE_IMAGE_TAG_KEY='__BASE_IMAGE_TAG__';
 BASE_IMAGE_TAG_SED="s|${BASE_IMAGE_TAG_KEY}|${BASE_IMAGE_TAG}|g";
 printf "BASE_IMAGE_TAG:         ${BASE_IMAGE_TAG}\n";
