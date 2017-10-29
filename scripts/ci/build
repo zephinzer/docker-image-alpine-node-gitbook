@@ -22,8 +22,9 @@ GITBOOK_VERSION="$(printf "${CONTAINER_INFO}" | grep 'GITBOOK' | cut -f 2 -d ':'
 printf "CURRENT GITBOOK         : ${GITBOOK_VERSION}\n";
 EXISTENCE_TAG="node-${NODE_VERSION}_yarn-${YARN_VERSION}_gitbook-${GITBOOK_VERSION}";
 EXISTS=$(${UTILS_DIR}/docker_registry_repo_tags "${REPOSITORY_NAME}");
-printf "$EXISTS" | jq -r '.[]|.name' | grep "${EXISTENCE_TAG}";
+printf "$EXISTS" | jq -r '.[]|.name' | grep "${EXISTENCE_TAG}" &>/dev/null;
 if [[ $? != "0" ]]; then
+  printf "Existence tag [${EXISTENCE_TAG}] not found. Pushing build...\n";
   printf "PUSHING                 : ${REPOSITORY_NAME}:${GITBOOK_VERSION}...\n";
   docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:${GITBOOK_VERSION};
   docker push              ${REPOSITORY_NAME}:${GITBOOK_VERSION};
@@ -34,6 +35,8 @@ if [[ $? != "0" ]]; then
   docker tag ${NEXT_TAG}   ${REPOSITORY_NAME}:latest;
   docker push              ${REPOSITORY_NAME}:latest;
   printf "DONE                    : $(date +'%Y-%m-%d %H:%M:%S')\n";
+else
+  printf "Existence tag [${EXISTENCE_TAG}] found. Not pushing build.\n";
 fi;
 
 ${CURR_DIR}/../build/teardown;
